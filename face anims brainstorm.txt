@@ -1,0 +1,72 @@
+animation queueing
+
+in the loop, check any incoming high signals -> new expression requests
+if in default expression, clear the queue, set timer to 0, and add new expression to be immediately displayed
+if in other expressions, just add next option to queue
+however, if in other expressions and new expression is default, swap immediately again
+
+global colour values - maybe don't have different colours within each expression, instead allowing for all to be done with 1 colour, and the colour can be changed to anything
+*maybe* have percentages in the colour arrays instead to get lighter/darker colours for depth
+
+have a queue (push and pop, FIFO shit) - animation id, and timer for that frame
+have an "active animation" variable
+current animation finishes cycle first before swapping to the new expression
+if at end of animation cycle, and nothing else exists in queue, requeue new set of the animation according to "active animation" variable
+when adding new animation, give an id/lookup for a pixel data list, and a time (perhaps number of anim cycles, or milliseconds)
+
+have a global anim timer value (how long till do next thing in list)
+decrease either by decrementing each loop (unreliable), or have a second timer to compare the most recent anim "start time" to current time, and see if difference exceeds the timer.
+
+when timer expires, check anim queue for next thing to display
+if there is something, then set the appropriate pixel values, and update the timer values with whatever was provided
+if there is nothing left, check for a current active animation
+each active animations
+eg:
+if on "default" face, have it hold static for 4-5 seconds, then when that expires, add the blink anim, and another 5 second static after that
+
+add a function for queueing new animations
+slightly different rules depending on current anim state etc (as explained above)
+immediately clear and move to default if requested
+and immediately clear and move to other anim if on default
+but if on other anim, just queue whatever was requested (it won't take long, doesn't matter)
+could just be simpler to always clear and swap animations, but have a separate function for adding the queues, since some expressions are static, some are animations
+
+expression data arrays
+20 wide x 7 tall
+0 or 1 (boolean maybe to start with but swap to decimals so shading is possible) (or later move to full RGB per square if we're that nuts)
+display is in "normal" order, functions convert it to something that fits the LED set
+
+function to convert data arrays to serial LED values (accounting for reverses etc, maybe just generate a lookup table or hardcode one to better troubleshoot)
+lookup table better to allow for different LED setups (maybe if some idiot wants to use my code etc)
+([val 1, val 2, val 3] -> [43, 42, 41])
+so it's just a 20x7 array of 0 -> 139, but not in "correct" order
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+39 28 27 26 ...................................20
+for example, if the LED strip is zigzagged
+
+it's 140 values but could be worse, at least you can read what it's reading
+start with all 0s in output list
+iterate over expression array, read value, and use grid indeces to find corresponding index in grid-to-strip lookup table 
+so it might jump ahead or go in "reverse" direction, but the list will be of fixed size so doesn't have to be explicitly added to in order
+
+just run this conversion at setup once, and then have the "complete" LED data lists already done for lookup
+or better yet just have a separate script/file that creates the list for you first and the code just has to read from csv files at startup or something
+
+for loop to apply serial LED values to data line into LED strip
+it's already been ordered, so just go through and add one by one
+
+
+OTHER THOUGHTS FOR EXPRESSIONS AND COLOURS------------
+
+HAVE CONSTANTS FOR EACH EXPRESSION
+single main colour kinda limits the ability to have animations of different colours without restarting etc
+so instead maybe just have a "default colour" that the blink works for, but the other ones are specific pre-baked colours?
+eg orange annoyed, red angry, green sus etc.
+this can be done in the setup when it's creating all the expression colour data
+some expressions are a specific colour, but the initial ones are "default" colour
+maybe have another lookup table of expression ID -> colour so it knows which is which?
+
+colour read-in seems overkill but also might be smarter to do, just have low res images to feed in as data, but again, it'll have to be a script you run first to generate the finished expression data
+
+USE PYTHON TO READ IN IMAGES FOR EXPRESSIONS
+EZ PZ 1 TO 1 COLOURS OF PICTURE = DATA
