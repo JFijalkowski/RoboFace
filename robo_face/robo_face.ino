@@ -44,6 +44,10 @@ int IR_RECEIVE_PIN = 9;
 
 //CRGB leds[NUM_LEDS];
 
+typedef struct animationFrame {
+  int expression;
+  int millis;
+};
 
 
 void setup() {
@@ -51,10 +55,11 @@ void setup() {
   Serial.begin(9600);
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
   Serial.println("Started up");  
-  Hashtable<String, Expression> dict;
-  dict.put(String("BA45FF00"), NEUTRAL); // power
-  dict.put(String("E916FF00"), SCREENTEST);
-
+  Hashtable<String, Expression> buttonToAnim;
+  buttonToAnim.put(String("BA45FF00"), NEUTRAL); // power
+  buttonToAnim.put(String("E916FF00"), SCREENTEST);
+  animationFrame neutralStatic[1] = {{NEUTRAL, 5000}};
+  animationFrame neutralBlink[7] = {{NEUTRAL, 5000}, {BLINK1, 100}, {BLINK2, 100}, {BLINK3, 100}, {BLINK4, 100}, {BLINK5, 100}, {BLINK6, 100}};
 
 }
 
