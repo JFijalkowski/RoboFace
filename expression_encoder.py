@@ -3,7 +3,7 @@ import os
 ## take a directory of expression images and produce a C++ file with enum-referenceable RGB data
 
 #absolute filepath for folder containing expression image files
-expression_directory_path = "C:\\Users\\jonat\\Documents\\Robo Face\\expressions\\"
+expression_directory_path = "C:\\Users\\jonat\\Documents\\RoboFace\\expressions8x16\\"
 file_extension = bytes(".png", "utf-8")
 
 #get image dimensions from blank (all black pixels) expression
@@ -63,8 +63,32 @@ for expression in expression_names:
     file.write("\t" + expression + ", \n")
 file.write("};\n")
 
+#write enum of all animations (de-hard-code this later pls)
+file.write("""enum Animation {
+	ANIM_NEUTRAL,
+	ANIM_HAPPY,
+	ANIM_SUNGLASSES,
+	ANIM_CRYING,
+	ANIM_BUFFERING,
+	ANIM_OWO,
+	ANIM_SLEEPING,
+	ANIM_RAINBOW,
+	ANIM_SCREENTEST,
+	ANIM_BSOD1,
+	ANIM_BSOD2,
+	ANIM_HYPNO,
+	ANIM_BLUSH,
+	ANIM_HEART,
+	ANIM_SUS,
+    ANIM_SAD,
+	ANIM_HMM,
+	ANIM_VEXED,
+	ANIM_IRRITATED,
+	ANIM_ANGRY
+};""")
+
 #write expression data to map
-file.write("typedef std::tuple<int, int, int> rgb_values;\n")
+file.write("/**typedef std::tuple<int, int, int> rgb_values;\n")
 file.write("typedef std::vector<rgb_values> img_rgb_data;\n")
 file.write("typedef std::map<Expression, img_rgb_data> rgb_data_map;\n")
 file.write("rgb_data_map expression_data_map = {\n")
@@ -80,6 +104,6 @@ for expression in expression_names:
     line += "}},\n"
     file.write(line)
     
-file.write("};\n")
+file.write("};**/\n")
 
 file.close()
