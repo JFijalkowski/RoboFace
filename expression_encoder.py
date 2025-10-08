@@ -1,4 +1,5 @@
 from PIL import Image
+import json
 import os
 ## take a directory of expression images and produce a C++ file with enum-referenceable RGB data
 
@@ -19,9 +20,14 @@ expression_names = []
 #pixels are read in order of bottom left to top right, in triples of (r, g, b)
 expression_image_data = {}
 
+#animation name, which expressions (in order), ms per frame
+animation_json = {}
+
 #iterate over all files in expressions folder
 directory = (os.fsencode(expression_directory_path))
+
 for file in os.listdir(directory):
+    print(file)
     filename = os.fsencode(file)
     
     if file.endswith(file_extension):
@@ -31,6 +37,7 @@ for file in os.listdir(directory):
         expression_names.append(expression_name.decode())
         
         #extract RGB data
+        
         image = Image.open(expression_directory_path + filename.decode())
         for y in range(img_height):
             for x in range(img_width):
@@ -48,13 +55,19 @@ for file in os.listdir(directory):
 #print(expression_image_data)
 print(expression_names)
 
+#this file writes to a json constructing default animation information (ie: FOLDER NAME: IMAGE FILES)
+#loop through folders, but store image data as usual
+#extra python script to read json and add the animation map (or whatever structure) to the code (anim name -> list of : image name + time)
+
+
 #write C++ file
 file = open("expressions.h", "w")
 
-file.write("#include <map>\n")
-file.write("#include <vector>\n")
-file.write("#include <tuple>\n")
-file.write("#define TOTAL_PIXELS " + str(img_pixels_total) + "\n")
+file.write("""
+    #include <map>\n
+    #include <vector>\n
+    #include <tuple>\n
+    #define TOTAL_PIXELS """ + str(img_pixels_total) + "\n")
 
 #write enum of all processed expressions
 file.write("// Enum of expressions \n")
