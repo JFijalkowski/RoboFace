@@ -20,14 +20,11 @@ expression_names = []
 #pixels are read in order of bottom left to top right, in triples of (r, g, b)
 expression_image_data = {}
 
-#animation name, which expressions (in order), ms per frame
-animation_json = {}
 
 #iterate over all files in expressions folder
 directory = (os.fsencode(expression_directory_path))
 
 for file in os.listdir(directory):
-    print(file)
     filename = os.fsencode(file)
     
     if file.endswith(file_extension):
@@ -53,12 +50,10 @@ for file in os.listdir(directory):
         image.close()
         
 #print(expression_image_data)
-print(expression_names)
+#print(expression_names)
 
-#this file writes to a json constructing default animation information (ie: FOLDER NAME: IMAGE FILES)
-#loop through folders, but store image data as usual
-#extra python script to read json and add the animation map (or whatever structure) to the code (anim name -> list of : image name + time)
-
+animation_json = json.load(open("animation_data.json", "r"))
+print(animation_json)
 
 #write C++ file
 file = open("expressions.h", "w")
@@ -77,28 +72,10 @@ for expression in expression_names:
 file.write("};\n")
 
 #write enum of all animations (de-hard-code this later pls)
-file.write("""enum Animation {
-	ANIM_NEUTRAL,
-	ANIM_HAPPY,
-	ANIM_SUNGLASSES,
-	ANIM_CRYING,
-	ANIM_BUFFERING,
-	ANIM_OWO,
-	ANIM_SLEEPING,
-	ANIM_RAINBOW,
-	ANIM_SCREENTEST,
-	ANIM_BSOD1,
-	ANIM_BSOD2,
-	ANIM_HYPNO,
-	ANIM_BLUSH,
-	ANIM_HEART,
-	ANIM_SUS,
-    ANIM_SAD,
-	ANIM_HMM,
-	ANIM_VEXED,
-	ANIM_IRRITATED,
-	ANIM_ANGRY
-};""")
+file.write("enum Animation { \n")
+for animation_name in animation_json["anim_to_framedata"].keys():
+    file.write("\t" + animation_name + ", \n")
+file.write("}; \n")
 
 #write expression data to map
 file.write("/**typedef std::tuple<int, int, int> rgb_values;\n")
