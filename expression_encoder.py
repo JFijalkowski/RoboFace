@@ -68,8 +68,17 @@ file.write("""
 typedef struct animationFrame {
 \tint expression;
 \tint millis;
-};\n
+};
 """)
+
+file.write("""
+typedef struct rgbData {
+\tint r;
+\tint g;
+\tint b;
+};
+""")
+
 #write enum of all processed expressions
 file.write("// Enum of expressions \n")
 file.write("enum Expression {\n")
@@ -86,20 +95,20 @@ file.write("}; \n")
 #write expression data to map
 file.write("/**typedef std::tuple<int, int, int> rgb_values;\n")
 file.write("typedef std::vector<rgb_values> img_rgb_data;\n")
-file.write("typedef std::map<Expression, img_rgb_data> rgb_data_map;\n")
-file.write("rgb_data_map expression_data_map = {\n")
+file.write("typedef std::map<Expression, img_rgb_data> rgb_data_map;*/\n")
+file.write("rgbData expression_data_map["+ str(len(expression_names)) + "][" + str(img_pixels_total) + "]= {\n")
 #write pixel data list for each expression
 for expression in expression_names:
     img_data = expression_image_data[expression]
     #{[EXPRESSION], { {0,255,255}, ..., {0, 0, 0} }},
-    line = "\t{" + expression + ", {"
+    line = "\t{"
 
     for pixel in img_data:
         line += "{" + str(pixel[0]) + ", " + str(pixel[1]) + ", " + str(pixel[2]) + "}, "
     
-    line += "}},\n"
+    line += "},\n"
     file.write(line)
     
-file.write("};**/\n")
+file.write("};\n")
 
 file.close()

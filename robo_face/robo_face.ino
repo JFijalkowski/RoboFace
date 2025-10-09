@@ -45,6 +45,7 @@ void setup() {
   Serial.println(sizeof(animation_map[ANIM_NEUTRAL]));
   Serial.println(sizeof(animation_map[ANIM_HAPPY]));
   Serial.println(animation_map[1][0].millis);
+  Serial.println(expression_data_map_big[SCREENTEST][50].b);
 }
 
 void loop() {
