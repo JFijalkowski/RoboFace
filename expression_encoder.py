@@ -55,14 +55,19 @@ for file in os.listdir(directory):
 animation_json = json.load(open("animation_data.json", "r"))
 print(animation_json)
 
+#get animation and expression metadata
+num_expressions = len(expression_names)
+num_animations = len(animation_json["anim_to_framedata"].keys())
+max_anim_frames = animation_json["max_anim_frames"]
+
 #write C++ file
-file = open("expressions.h", "w")
+file = open("animations.h", "w")
 
 file.write("""
-#include <map>
-#include <vector>
-#include <tuple>
-#define TOTAL_PIXELS """ + str(img_pixels_total) + "\n")
+#include <ArxContainer.h>
+#include <Hashtable.h>
+""""#define MAX_ANIM_FRAMES " + str(max_anim_frames) + "\n"
+)
 
 file.write("""
 typedef struct animationFrame {
@@ -71,33 +76,62 @@ typedef struct animationFrame {
 };
 """)
 
+
+
+#write enum of all remote buttons
+file.write("enum Button {\n")
+for button in animation_json["button_to_anim"]:
+    file.write("\t" + button + ", \n")
+file.write("};\n")
+
+#write enum of all processed expressions
+file.write("enum Expression {\n")
+for expression in expression_names:
+    file.write("\t" + expression + ", \n")
+file.write("};\n")
+
+#write enum of all animations
+file.write("enum Animation { \n")
+for animation_name in animation_json["anim_to_framedata"].keys():
+    file.write("\t" + animation_name + ", \n")
+file.write("}; \n")
+
+#write func to create hex code -> animation enum map
+#flattens the hex code -> button -> animation to just code -> animation, since the board doesn't need to know the button names
+file.write("std::map<String, Animation> codeToAnim { \n")
+for code in animation_json["code_to_button"].keys():
+    button_name = animation_json["code_to_button"][code]
+    animation_name = animation_json["button_to_anim"][button_name]
+    file.write("\t{\"" + code + "\", " + animation_name + "}, \n")
+file.write("}; \n")
+
+#write expression and timing data for each animation
+file.write("animationFrame animationData[" + str(num_animations) + "][" +  str(max_anim_frames) + "]= {\n" )
+for animation in animation_json["anim_to_framedata"].keys():
+    frame_data = animation_json["anim_to_framedata"][animation]
+    print(frame_data)
+    line = "\t{"
+    for frame in frame_data:
+        print(frame)
+        line += "{" + frame[0] + ", " + str(frame[1]) + "}, "
+    line += "},\n"
+    file.write(line)
+    
+file.write("};\n")
+
+file.close()
+
+file = open("expressions.h", "w")
 file.write("""
+#define TOTAL_PIXELS """ + str(img_pixels_total) + "\n" + """
 typedef struct rgbData {
 \tint r;
 \tint g;
 \tint b;
 };
 """)
-
-#write enum of all processed expressions
-file.write("// Enum of expressions \n")
-file.write("enum Expression {\n")
-for expression in expression_names:
-    file.write("\t" + expression + ", \n")
-file.write("};\n")
-
-#write enum of all animations (de-hard-code this later pls)
-file.write("enum Animation { \n")
-for animation_name in animation_json["anim_to_framedata"].keys():
-    file.write("\t" + animation_name + ", \n")
-file.write("}; \n")
-
-#write expression data to map
-file.write("/**typedef std::tuple<int, int, int> rgb_values;\n")
-file.write("typedef std::vector<rgb_values> img_rgb_data;\n")
-file.write("typedef std::map<Expression, img_rgb_data> rgb_data_map;*/\n")
-file.write("rgbData expression_data_map["+ str(len(expression_names)) + "][" + str(img_pixels_total) + "]= {\n")
-#write pixel data list for each expression
+#write pixel data for each expression
+file.write("rgbData expressionData["+ str(num_expressions) + "][" + str(img_pixels_total) + "]= {\n")
 for expression in expression_names:
     img_data = expression_image_data[expression]
     #{[EXPRESSION], { {0,255,255}, ..., {0, 0, 0} }},
@@ -110,5 +144,7 @@ for expression in expression_names:
     file.write(line)
     
 file.write("};\n")
+
+
 
 file.close()

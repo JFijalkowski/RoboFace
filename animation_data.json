@@ -53,12 +53,12 @@
         "ANIM_CRYING"       : [["CRYING", 5000]],
         "ANIM_BUFFERING"    : [["BUFFERING1",60], ["BUFFERING2",60], ["BUFFERING3",60], ["BUFFERING4",60]],
         "ANIM_OWO"          : [["OWO", 5000]],
-        "ANIM_SLEEPING"     : [["SLEEPING"], 5000],
-        "ANIM_RAINBOW"      : [["RAINBOW"], 5000],
-        "ANIM_SCREENTEST"   : [["SCREENTEST"], 5000],
-        "ANIM_BSOD1"        : [["BSOD1"], 5000],
-        "ANIM_BSOD2"        : [["BSOD2"], 5000],
-        "ANIM_UNUSED"       : [["BLANK"], 5000],
+        "ANIM_SLEEPING"     : [["SLEEPING", 5000]],
+        "ANIM_RAINBOW"      : [["RAINBOW", 5000]],
+        "ANIM_SCREENTEST"   : [["SCREENTEST", 5000]],
+        "ANIM_BSOD1"        : [["BSOD1", 5000]],
+        "ANIM_BSOD2"        : [["BSOD2", 5000]],
+        "ANIM_UNUSED"       : [["BLANK", 5000]],
         "ANIM_HYPNO"        : [["HYPNO1", 100], ["HYPNO2", 100], ["HYPNO3", 100]],
         "ANIM_BLUSH"        : [["BLUSH", 5000]],
         "ANIM_HEART"        : [["HEART1", 200], ["HEART2", 200], ["HEART1", 200], ["HEART3", 200]],
@@ -68,5 +68,6 @@
         "ANIM_VEXED"        : [["VEXED", 5000]],
         "ANIM_IRRITATED"    : [["IRRITATED", 5000]],
         "ANIM_ANGRY"        : [["ANGRY", 5000]]
-    }
+    },
+    "max_anim_frames" : 7
 }
