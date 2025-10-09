@@ -73,13 +73,6 @@ typedef struct rgbData {
 	int b;
 };
 
-/**
-void addAnimations(Hashtable<Animation, animationFrame[]> table) {
-	table.put(ANIM_NEUTRAL, {{NEUTRAL, 5000}});
-	Serial.println("run the extra function");
-};
-*/
-
 rgbData expression_data_map[2][3] = {
 	{{0,0,0}, {0,0,0}, {0,0,0}},
 	{{0,0,0}, {0,0,0}, {0,0,0}}
