@@ -1,11 +1,14 @@
 
-    #include <map>
+#include <map>
+#include <vector>
+#include <tuple>
+#define TOTAL_PIXELS 128
 
-    #include <vector>
+typedef struct animationFrame {
+	int expression;
+	int millis;
+};
 
-    #include <tuple>
-
-    #define TOTAL_PIXELS 128
 // Enum of expressions 
 enum Expression {
 	ANGRY, 
@@ -50,22 +53,22 @@ enum Animation {
 	ANIM_SUNGLASSES, 
 	ANIM_CRYING, 
 	ANIM_BUFFERING, 
-	OWO, 
-	SLEEPING, 
-	RAINBOW, 
-	SCREENTEST, 
-	BSOD1, 
-	BSOD2, 
-	UNUSED, 
-	HYPNO, 
-	BLUSH, 
-	HEART, 
-	SUS, 
-	SAD, 
-	HMM, 
-	VEXED, 
-	IRRITATED, 
-	ANGRY, 
+	ANIM_OWO, 
+	ANIM_SLEEPING, 
+	ANIM_RAINBOW, 
+	ANIM_SCREENTEST, 
+	ANIM_BSOD1, 
+	ANIM_BSOD2, 
+	ANIM_UNUSED, 
+	ANIM_HYPNO, 
+	ANIM_BLUSH, 
+	ANIM_HEART, 
+	ANIM_SUS, 
+	ANIM_SAD, 
+	ANIM_HMM, 
+	ANIM_VEXED, 
+	ANIM_IRRITATED, 
+	ANIM_ANGRY, 
 }; 
 /**typedef std::tuple<int, int, int> rgb_values;
 typedef std::vector<rgb_values> img_rgb_data;

@@ -2,6 +2,7 @@
 #include <IRremote.hpp>
 #include "expressions.h"
 #include <Hashtable.h>
+#include <cppQueue.h>
 
 #define LED_Pin 7
 #define NUM_LEDS 140
@@ -22,10 +23,7 @@ int IR_RECEIVE_PIN = 9;
 
 //CRGB leds[NUM_LEDS];
 
-typedef struct animationFrame {
-  int expression;
-  int millis;
-};
+
 
 
 
@@ -37,10 +35,16 @@ void setup() {
   buttonToAnim.put("BA45FF00", NEUTRAL); // power
   buttonToAnim.put("E916FF00", SCREENTEST);
   buttonToAnim.put("B946FF00", HAPPY);
-  Hashtable<Expression, animationFrame[]>;
+  //Hashtable<Animation, animationFrame[]> animToFrames;
   animationFrame neutralStatic[1] = {{NEUTRAL, 5000}};
   animationFrame neutralBlink[7] = {{NEUTRAL, 5000}, {BLINK1, 100}, {BLINK2, 100}, {BLINK3, 100}, {BLINK4, 100}, {BLINK5, 100}, {BLINK6, 100}};
-
+  //animToFrames.put(ANIM_NEUTRAL, neutralStatic);
+  Serial.println(neutralBlink[2].expression);
+  Serial.println(buttonToAnim["BA45FF00"]);
+  Serial.println(expression_data_map[ANGRY][0].b);
+  Serial.println(sizeof(animation_map[ANIM_NEUTRAL]));
+  Serial.println(sizeof(animation_map[ANIM_HAPPY]));
+  Serial.println(animation_map[1][0].millis);
 }
 
 void loop() {

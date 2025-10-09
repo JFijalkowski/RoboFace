@@ -2,6 +2,7 @@
 //#include <map>
 //#include <vector>
 //#include <tuple>
+#include <Hashtable.h>
 #define TOTAL_PIXELS 140
 // Enum of expressions 
 enum Expression {
@@ -60,6 +61,35 @@ enum Animation {
 	ANIM_IRRITATED,
 	ANIM_ANGRY
 };
+
+typedef struct animationFrame {
+  int expression;
+  int millis;
+};
+
+typedef struct rgbData {
+	int r;
+	int g;
+	int b;
+};
+
+/**
+void addAnimations(Hashtable<Animation, animationFrame[]> table) {
+	table.put(ANIM_NEUTRAL, {{NEUTRAL, 5000}});
+	Serial.println("run the extra function");
+};
+*/
+
+rgbData expression_data_map[2][3] = {
+	{{0,0,0}, {0,0,0}, {0,0,0}},
+	{{0,0,0}, {0,0,0}, {0,0,0}}
+};
+
+animationFrame animation_map[2][3] = {
+	{{ANGRY, 100}, {ANGRY, 100}},
+	{{ANGRY, 200}}
+};
+
 /**
 typedef std::tuple<int, int, int> rgb_values;
 typedef std::vector<rgb_values> img_rgb_data;

@@ -59,11 +59,17 @@ print(animation_json)
 file = open("expressions.h", "w")
 
 file.write("""
-    #include <map>\n
-    #include <vector>\n
-    #include <tuple>\n
-    #define TOTAL_PIXELS """ + str(img_pixels_total) + "\n")
+#include <map>
+#include <vector>
+#include <tuple>
+#define TOTAL_PIXELS """ + str(img_pixels_total) + "\n")
 
+file.write("""
+typedef struct animationFrame {
+\tint expression;
+\tint millis;
+};\n
+""")
 #write enum of all processed expressions
 file.write("// Enum of expressions \n")
 file.write("enum Expression {\n")
