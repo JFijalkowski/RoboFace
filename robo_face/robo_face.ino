@@ -2,7 +2,6 @@
 #include <IRremote.hpp>
 #include "expressions.h"
 #include "animations.h"
-#include <Hashtable.h>
 #include <cppQueue.h>
 
 #define LED_Pin 7
@@ -20,24 +19,12 @@ int IR_RECEIVE_PIN = 9;
 void setup() {
   Serial.begin(9600);
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
-  Serial.println("Started up");  
-  //Hashtable<String, Animation> codeToAnim;
-  //createCodeToAnimTable(codeToAnim);
-  //Serial.println(codeToAnim["BF40FF00"]);
-  //Serial.println(expressionData[ANGRY][0].b);
-  //Serial.println(expressionData[SCREENTEST][50].b);
-  Serial.println(codeToAnim["E916FF00"]);
-  // range based access
-  //codeToAnim["F30CFF00"] = ANIM_HYPNO;
-  
-  
-  
-  
+  Serial.println("Started up"); 
 }
 
 void loop() {
   if (IrReceiver.decode()) {
-      Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX); // Print "old" raw data
+      //Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX); // Print "old" raw data
       
       auto recvData = IrReceiver.decodedIRData.decodedRawData;
       char hexCode [8];
@@ -46,14 +33,12 @@ void loop() {
       hexString.toUpperCase();
       if(!hexString.equals("0")){
         Serial.println(hexString);
-        Serial.println(codeToAnim[hexString]);
-        Serial.println(animationData[codeToAnim[hexString]][1].millis);
-        for (const auto& m : codeToAnim)
-          {
-            Serial.print("{");
-            Serial.print(m.first); 
-            Serial.println("}");
-          }
+        int animNumber = getAnimationFromCode(codeToAnim, hexString);
+        if (animNumber != ANIM_NONE) {
+          animationFrame frame = animationData[animNumber][0];
+          Serial.println(frame.expression);
+          Serial.println(frame.millis);
+        }
       }
       IrReceiver.resume(); // Enable receiving of the next value
   }

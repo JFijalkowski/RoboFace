@@ -1,11 +1,13 @@
-
-#include <ArxContainer.h>
-#include <Hashtable.h>
+#define TOTAL_CODES 21
 #define MAX_ANIM_FRAMES 7
 
 typedef struct animationFrame {
 	int expression;
 	int millis;
+};
+typedef struct codeMap {
+	String code;
+	int animation;
 };
 enum Button {
 	BTN_POWER, 
@@ -66,6 +68,7 @@ enum Expression {
 	SUS2, 
 	SUS3, 
 	VEXED, 
+	EXP_NONE
 };
 enum Animation { 
 	ANIM_DEFAULT, 
@@ -89,8 +92,9 @@ enum Animation {
 	ANIM_VEXED, 
 	ANIM_IRRITATED, 
 	ANIM_ANGRY, 
+	ANIM_NONE
 }; 
-std::map<String, Animation> codeToAnim { 
+codeMap codeToAnim[21] = { 
 	{"BA45FF00", ANIM_DEFAULT}, 
 	{"B946FF00", ANIM_HAPPY}, 
 	{"B847FF00", ANIM_SUNGLASSES}, 
@@ -136,3 +140,14 @@ animationFrame animationData[21][7]= {
 	{{IRRITATED, 5000}, },
 	{{ANGRY, 5000}, },
 };
+
+//find animation associated to IR hex code
+int getAnimationFromCode(codeMap codeList[], String code) {
+  for (int i = 0; i < TOTAL_CODES; i++ ) {
+    if(codeList[i].code.equals(code)) {
+      return codeList[i].animation;
+    }
+  }
+  //if no match found, return a "no match" number
+  return ANIM_NONE;
+}

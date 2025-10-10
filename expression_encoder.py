@@ -38,7 +38,7 @@ for file in os.listdir(directory):
         image = Image.open(expression_directory_path + filename.decode())
         for y in range(img_height):
             for x in range(img_width):
-                pixel = image.getpixel((x,y))
+                pixel = image.getpixel((x,y)) 
                 #ignores 4th val, so no transparency used if png
                 rgb = (pixel[0], pixel[1], pixel[2])
                 if (len(rgb) > 3):
@@ -56,26 +56,28 @@ animation_json = json.load(open("animation_data.json", "r"))
 print(animation_json)
 
 #get animation and expression metadata
+num_codes = len(animation_json["code_to_button"].keys())
 num_expressions = len(expression_names)
 num_animations = len(animation_json["anim_to_framedata"].keys())
 max_anim_frames = animation_json["max_anim_frames"]
 
-#write C++ file
+#write C++ file to store animation data and 
 file = open("animations.h", "w")
+#constants for array sizes
+file.write("#define TOTAL_CODES " + str(num_codes) + "\n")
+file.write("#define MAX_ANIM_FRAMES " + str(max_anim_frames) + "\n")
 
-file.write("""
-#include <ArxContainer.h>
-#include <Hashtable.h>
-""""#define MAX_ANIM_FRAMES " + str(max_anim_frames) + "\n"
-)
-
+#add structs for arrays of animation and hex code data
 file.write("""
 typedef struct animationFrame {
 \tint expression;
 \tint millis;
 };
+typedef struct codeMap {
+\tString code;
+\tint animation;
+};
 """)
-
 
 
 #write enum of all remote buttons
@@ -88,17 +90,19 @@ file.write("};\n")
 file.write("enum Expression {\n")
 for expression in expression_names:
     file.write("\t" + expression + ", \n")
+file.write("\tEXP_NONE\n")
 file.write("};\n")
 
 #write enum of all animations
 file.write("enum Animation { \n")
 for animation_name in animation_json["anim_to_framedata"].keys():
     file.write("\t" + animation_name + ", \n")
+file.write("\tANIM_NONE\n")
 file.write("}; \n")
 
 #write func to create hex code -> animation enum map
 #flattens the hex code -> button -> animation to just code -> animation, since the board doesn't need to know the button names
-file.write("std::map<String, Animation> codeToAnim { \n")
+file.write("codeMap codeToAnim[" + str(num_codes) + "] = { \n")
 for code in animation_json["code_to_button"].keys():
     button_name = animation_json["code_to_button"][code]
     animation_name = animation_json["button_to_anim"][button_name]
@@ -118,6 +122,21 @@ for animation in animation_json["anim_to_framedata"].keys():
     file.write(line)
     
 file.write("};\n")
+
+#write function for matching incoming code to its associated animation
+file.write("""
+//find animation associated to IR hex code
+int getAnimationFromCode(codeMap codeList[], String code) {
+  for (int i = 0; i < TOTAL_CODES; i++ ) {
+    if(codeList[i].code.equals(code)) {
+      return codeList[i].animation;
+    }
+  }
+  //if no match found, return a "no match" number
+  return ANIM_NONE;
+}
+""")
+
 
 file.close()
 
