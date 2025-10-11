@@ -6,34 +6,74 @@
 
 #define LED_Pin 7
 #define NUM_LEDS 140
+#define IR_RECEIVE_PIN 9
 
 #define DECODE_NEC
 
-String POWER = String("BA45FF00");
-String ZERO_BUTTON = String("E916FF00");
-
 cppQueue animationQueue(4, MAX_ANIM_FRAMES, FIFO);
-
-int IR_RECEIVE_PIN = 9;
-
+unsigned long animFrameStart;
+unsigned long animFrameEnd;
+int currentAnimation;
+int currentExpression;
 //CRGB leds[NUM_LEDS];
 
 void setup() {
   Serial.begin(9600);
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
   Serial.println("Started up"); 
-  int currentAnimation = ANIM_DEFAULT;
-  unsigned long animFrameStart = millis();
-  Serial.println(animFrameStart);
-  unsigned long animFrameEnd = millis() + animationData[ANIM_DEFAULT][0].millis;
-  Serial.println(animFrameEnd);
+  
+  
   //start animation is default w/ blinking
+  currentAnimation = ANIM_DEFAULT;
   for(int i = 0; i < MAX_ANIM_FRAMES; i++){
-    animationQueue.push(&animationData[ANIM_DEFAULT][i]);
+    animationQueue.push(&animationData[currentAnimation][i]);
   }
+
+  animationFrame frame;
+  animationQueue.pop(&frame);
+  currentExpression = frame.expression;
+
+  animFrameStart = millis();
+  Serial.println(animFrameStart);
+  animFrameEnd = millis() + frame.millis;
+  Serial.println(animFrameEnd);
+  
+  Serial.print("Current Animation: ");
+  Serial.println(currentAnimation);
+  Serial.print("Current Expression: ");
+  Serial.println(currentExpression);
+
 }
 
 void loop() {
+  //if current animation frame has been displayed for the necessary duration
+  if (millis() > animFrameEnd){
+    
+    //if at end of animation, loop current animation
+    if(animationQueue.isEmpty()){
+      for(int i = 0; i < MAX_ANIM_FRAMES; i++){
+        animationQueue.push(&animationData[currentAnimation][i]);
+      }
+    }
+
+    Serial.println("Replacing anim frame");
+
+    animationFrame frame;
+    animationQueue.pop(&frame);
+    currentExpression = frame.expression;
+
+    animFrameStart = millis();
+    Serial.println(animFrameStart);
+    animFrameEnd = millis() + frame.millis;
+    Serial.println(animFrameEnd);
+
+    Serial.print("Current Animation: ");
+    Serial.println(currentAnimation);
+    Serial.print("Current Expression: ");
+    Serial.println(currentExpression);
+  }
+
+  //if an IR data packet has been received
   if (IrReceiver.decode()) {    
 
     //convert received data to 8 character hex code
@@ -52,6 +92,7 @@ void loop() {
 
         //clear old animation from queue
         animationQueue.flush();
+        currentAnimation=animNumber;
 
         //add all frames of the selected animation to the queue
         for(int i = 0; i < MAX_ANIM_FRAMES; i++){
