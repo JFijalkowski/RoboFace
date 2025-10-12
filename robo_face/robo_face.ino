@@ -35,12 +35,7 @@ void setup() {
   currentExpression = frame.expression;
 
   animFrameStart = millis();
-  Serial.println(animFrameStart);
   animFrameEnd = millis() + frame.millis;
-  Serial.println(animFrameEnd);
-  
-  Serial.print("Current Animation: ");
-  Serial.println(currentAnimation);
   Serial.print("Current Expression: ");
   Serial.println(currentExpression);
 
@@ -60,16 +55,14 @@ void loop() {
     ltoa(recvData, hexCode, 16);
     //String hexString = String(hexCode);
     //hexString.toUpperCase();
-    Serial.println("something was pressed");
 
     //ignore repeated/burst data (cluster of the same code is decoded as "0")
     if(strcmp("0", hexCode) != 0){
-      Serial.print("incoming code ");
       Serial.println(hexCode);
       int animNumber = getAnimationFromCode(codeToAnim, hexCode);
       //a corresponding animation was found for the received code
       if (animNumber != ANIM_NONE) {
-        Serial.println(animNumber);
+        //Serial.println(animNumber);
 
         //clear old animation from queue
         animationQueue.flush();
@@ -87,9 +80,7 @@ void loop() {
     IrReceiver.resume(); // Enable receiving of the next value
   }
 
-  //TODO: SOMETHING WRONG HERE MAKING IT HANG AND NOT RECEIVE IR SIGNALS ANYMORE
-  //TODO: LOOK AT PROGMEM SO DYNAMIC MEMORY ISN'T SO DAMN FULL
-  //if current animation frame has been displayed for the necessary duration
+  //if current animation frame has been displayed for the necessary duration, display next or loop
   if (millis() > animFrameEnd){
     
     //if at end of animation, loop current animation
