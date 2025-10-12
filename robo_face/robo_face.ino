@@ -4,6 +4,7 @@
 #include "animations.h"
 #include <cppQueue.h>
 
+
 #define LED_Pin 7
 #define NUM_LEDS 140
 #define IR_RECEIVE_PIN 9
@@ -46,6 +47,48 @@ void setup() {
 }
 
 void loop() {
+
+  
+
+  //if an IR data packet has been received
+  if (IrReceiver.decode()) {   
+    Serial.println("receiving..."); 
+
+    //convert received data to 8 character hex code
+    auto recvData = IrReceiver.decodedIRData.decodedRawData;
+    char hexCode [9];
+    ltoa(recvData, hexCode, 16);
+    //String hexString = String(hexCode);
+    //hexString.toUpperCase();
+
+    //ignore repeated/burst data (cluster of the same code is decoded as "0")
+    if(strcmp("0", hexCode) != 0){
+      Serial.print("incoming code ");
+      Serial.println(hexCode);
+      int animNumber = getAnimationFromCode(codeToAnim, hexCode);
+      //a corresponding animation was found for the received code
+      if (animNumber != ANIM_NONE) {
+        Serial.println(animNumber);
+
+        //clear old animation from queue
+        animationQueue.flush();
+        currentAnimation=animNumber;
+
+        //add all frames of the selected animation to the queue
+        for(int i = 0; i < MAX_ANIM_FRAMES; i++){
+          //if the frame has 0 ms, it can be ignored
+          if(animationData[animNumber][i].millis != 0){
+            animationQueue.push(&animationData[animNumber][i]);
+          }
+        }
+      }
+    }
+    IrReceiver.resume(); // Enable receiving of the next value
+  }
+
+  /*
+  //TODO: SOMETHING WRONG HERE MAKING IT HANG AND NOT RECEIVE IR SIGNALS ANYMORE
+  //TODO: LOOK AT PROGMEM SO DYNAMIC MEMORY ISN'T SO DAMN FULL
   //if current animation frame has been displayed for the necessary duration
   if (millis() > animFrameEnd){
     
@@ -72,37 +115,5 @@ void loop() {
     Serial.print("Current Expression: ");
     Serial.println(currentExpression);
   }
-
-  //if an IR data packet has been received
-  if (IrReceiver.decode()) {    
-
-    //convert received data to 8 character hex code
-    auto recvData = IrReceiver.decodedIRData.decodedRawData;
-    char hexCode [8];
-    ltoa(recvData, hexCode, 16);
-    String hexString = String(hexCode);
-    hexString.toUpperCase();
-
-    //ignore repeated/burst data (cluster of the same code is decoded as "0")
-    if(!hexString.equals("0")){
-      Serial.println(hexString);
-      int animNumber = getAnimationFromCode(codeToAnim, hexString);
-      //a corresponding animation was found for the received code
-      if (animNumber != ANIM_NONE) {
-
-        //clear old animation from queue
-        animationQueue.flush();
-        currentAnimation=animNumber;
-
-        //add all frames of the selected animation to the queue
-        for(int i = 0; i < MAX_ANIM_FRAMES; i++){
-          //if the frame has 0 ms, it can be ignored
-          if(animationData[animNumber][i].millis != 0){
-            animationQueue.push(&animationData[animNumber][i]);
-          }
-        }
-      }
-    }
-    IrReceiver.resume(); // Enable receiving of the next value
-  }
+  */
 }

@@ -61,7 +61,7 @@ num_expressions = len(expression_names)
 num_animations = len(animation_json["anim_to_framedata"].keys())
 max_anim_frames = animation_json["max_anim_frames"]
 
-#write C++ file to store animation data and 
+#write C++ file to store animation data structures and functions
 file = open("animations.h", "w")
 #constants for array sizes
 file.write("#define TOTAL_CODES " + str(num_codes) + "\n")
@@ -74,11 +74,10 @@ typedef struct animationFrame {
 \tint millis;
 };
 typedef struct codeMap {
-\tString code;
+\tchar code[9];
 \tint animation;
 };
 """)
-
 
 #write enum of all remote buttons
 file.write("enum Button {\n")
@@ -126,9 +125,9 @@ file.write("};\n")
 #write function for matching incoming code to its associated animation
 file.write("""
 //find animation associated to IR hex code
-int getAnimationFromCode(codeMap codeList[], String code) {
+int getAnimationFromCode(codeMap codeList[], char code[9]) {
   for (int i = 0; i < TOTAL_CODES; i++ ) {
-    if(codeList[i].code.equals(code)) {
+    if(strcmp(codeList[i].code, code) == 0) {
       return codeList[i].animation;
     }
   }

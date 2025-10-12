@@ -6,7 +6,7 @@ typedef struct animationFrame {
 	int millis;
 };
 typedef struct codeMap {
-	String code;
+	char code[9];
 	int animation;
 };
 enum Button {
@@ -95,27 +95,27 @@ enum Animation {
 	ANIM_NONE
 }; 
 codeMap codeToAnim[21] = { 
-	{"BA45FF00", ANIM_DEFAULT}, 
-	{"B946FF00", ANIM_HAPPY}, 
-	{"B847FF00", ANIM_SUNGLASSES}, 
-	{"BB44FF00", ANIM_CRYING}, 
-	{"BF40FF00", ANIM_BUFFERING}, 
-	{"BC43FF00", ANIM_OWO}, 
-	{"F807FF00", ANIM_SLEEPING}, 
-	{"EA15FF00", ANIM_RAINBOW}, 
-	{"F609FF00", ANIM_SCREENTEST}, 
-	{"E916FF00", ANIM_BSOD1}, 
-	{"E619FF00", ANIM_BSOD2}, 
-	{"F20DFF00", ANIM_UNUSED}, 
-	{"F30CFF00", ANIM_HYPNO}, 
-	{"E718FF00", ANIM_BLUSH}, 
-	{"A15EFF00", ANIM_HEART}, 
-	{"F708FF00", ANIM_SUS}, 
-	{"E31CFF00", ANIM_SAD}, 
-	{"A55AFF00", ANIM_HMM}, 
-	{"BD42FF00", ANIM_VEXED}, 
-	{"AD52FF00", ANIM_IRRITATED}, 
-	{"B54AFF00", ANIM_ANGRY}, 
+	{"ba45ff00", ANIM_DEFAULT}, 
+	{"b946ff00", ANIM_HAPPY}, 
+	{"b847ff00", ANIM_SUNGLASSES}, 
+	{"bb44ff00", ANIM_CRYING}, 
+	{"bf40ff00", ANIM_BUFFERING}, 
+	{"bc43ff00", ANIM_OWO}, 
+	{"f807ff00", ANIM_SLEEPING}, 
+	{"ea15ff00", ANIM_RAINBOW}, 
+	{"f609ff00", ANIM_SCREENTEST}, 
+	{"e916ff00", ANIM_BSOD1}, 
+	{"e619ff00", ANIM_BSOD2}, 
+	{"f20dff00", ANIM_UNUSED}, 
+	{"f30cff00", ANIM_HYPNO}, 
+	{"e718ff00", ANIM_BLUSH}, 
+	{"a15eff00", ANIM_HEART}, 
+	{"f708ff00", ANIM_SUS}, 
+	{"e31cff00", ANIM_SAD}, 
+	{"a55aff00", ANIM_HMM}, 
+	{"bd42ff00", ANIM_VEXED}, 
+	{"ad52ff00", ANIM_IRRITATED}, 
+	{"b54aff00", ANIM_ANGRY}, 
 }; 
 animationFrame animationData[21][7]= {
 	{{NEUTRAL, 5000}, {BLINK1, 60}, {BLINK2, 60}, {BLANK, 60}, {BLINK3, 60}, {BLINK4, 60}, {BLINK5, 60}, },
@@ -142,9 +142,9 @@ animationFrame animationData[21][7]= {
 };
 
 //find animation associated to IR hex code
-int getAnimationFromCode(codeMap codeList[], String code) {
+int getAnimationFromCode(codeMap codeList[], char code[9]) {
   for (int i = 0; i < TOTAL_CODES; i++ ) {
-    if(codeList[i].code.equals(code)) {
+    if(strcmp(codeList[i].code, code) == 0) {
       return codeList[i].animation;
     }
   }
