@@ -1,12 +1,12 @@
-//#include <FastLED.h>
+#include <FastLED.h>
 #include <IRremote.hpp>
 #include "expressions.h"
 #include "animations.h"
 #include <cppQueue.h>
 
 
-#define LED_Pin 7
-#define NUM_LEDS 140
+#define LED_PIN 7
+#define LED_DATA_PIN 11
 #define IR_RECEIVE_PIN 9
 
 #define DECODE_NEC
@@ -16,12 +16,15 @@ unsigned long animFrameStart;
 unsigned long animFrameEnd;
 int currentAnimation;
 int currentExpression;
-//CRGB leds[NUM_LEDS];
+
+CRGB leds[TOTAL_PIXELS];
 
 void setup() {
   Serial.begin(9600);
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
   Serial.println("Started up"); 
+
+  FastLED.addLeds<WS2812, LED_DATA_PIN>(leds, TOTAL_PIXELS);
   
   
   //start animation is default w/ blinking
@@ -63,7 +66,6 @@ void loop() {
       //a corresponding animation was found for the received code
       if (animNumber != ANIM_NONE) {
         //Serial.println(animNumber);
-
         //clear old animation from queue
         animationQueue.flush();
         currentAnimation=animNumber;
