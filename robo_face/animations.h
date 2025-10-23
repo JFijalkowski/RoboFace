@@ -94,7 +94,7 @@ enum Animation {
 	ANIM_ANGRY, 
 	ANIM_NONE
 }; 
-codeMap codeToAnim[21] = { 
+const codeMap codeToAnim[21] = { 
 	{"ba45ff00", ANIM_DEFAULT}, 
 	{"b946ff00", ANIM_HAPPY}, 
 	{"b847ff00", ANIM_SUNGLASSES}, 
@@ -117,12 +117,12 @@ codeMap codeToAnim[21] = {
 	{"ad52ff00", ANIM_IRRITATED}, 
 	{"b54aff00", ANIM_ANGRY}, 
 }; 
-animationFrame animationData[21][7]= {
+PROGMEM const animationFrame animationData[21][7]= {
 	{{NEUTRAL, 5000}, {BLINK1, 60}, {BLINK2, 60}, {BLANK, 60}, {BLINK3, 60}, {BLINK4, 60}, {BLINK5, 60}, },
 	{{HAPPY, 5000}, },
 	{{SUNGLASSES, 5000}, },
 	{{CRYING, 5000}, },
-	{{BUFFERING1, 60}, {BUFFERING2, 60}, {BUFFERING3, 60}, {BUFFERING4, 60}, },
+	{{BUFFERING1, 100}, {BUFFERING2, 100}, {BUFFERING3, 100}, {BUFFERING4, 100}, },
 	{{OWO, 5000}, },
 	{{SLEEPING, 5000}, },
 	{{RAINBOW, 5000}, },
@@ -133,7 +133,7 @@ animationFrame animationData[21][7]= {
 	{{HYPNO1, 100}, {HYPNO2, 100}, {HYPNO3, 100}, },
 	{{BLUSH, 5000}, },
 	{{HEART1, 200}, {HEART2, 200}, {HEART1, 200}, {HEART3, 200}, },
-	{{SUS1, 300}, {SUS2, 300}, {SUS1, 300}, {SUS3, 300}, },
+	{{SUS1, 500}, {SUS2, 500}, {SUS1, 500}, {SUS3, 500}, },
 	{{SAD, 5000}, },
 	{{HMM, 5000}, },
 	{{VEXED, 5000}, },

@@ -3,6 +3,9 @@ import json
 import os
 ## take a directory of expression images and produce a C++ file with enum-referenceable RGB data
 
+#scale down rgb values so pixels aren't maxxed out by bright colours in images
+img_brightness = 0.1
+
 #absolute filepath for folder containing expression image files
 expression_directory_path = "C:\\Users\\jonat\\Documents\\RoboFace\\expressions8x16\\"
 file_extension = bytes(".png", "utf-8")
@@ -33,18 +36,26 @@ for file in os.listdir(directory):
         expression_name = filename.removesuffix(file_extension)
         expression_names.append(expression_name.decode())
         
-        #extract RGB data
-        
+        #extract GRB data, in same order as pixels in matrix (zigzag along x axis, inverting along y axis)
         image = Image.open(expression_directory_path + filename.decode())
-        for y in range(img_height):
-            for x in range(img_width):
-                pixel = image.getpixel((x,y)) 
+        for x in range(img_width):
+            #if on an even-numbered column, count pixels from bottom up
+            start_y = 0
+            end_y = img_height
+            direction = 1
+            #if on an odd-numbered row, count pixels from top down
+            if(x%2 == 1):
+                start_y = img_height -1
+                end_y = -1
+                direction = -1
+            
+            for y in range(start_y, end_y, direction):
+                pixel = image.getpixel((x,y))
                 #ignores 4th val, so no transparency used if png
-                rgb = (pixel[0], pixel[1], pixel[2])
-                if (len(rgb) > 3):
-                    print(len(rgb))
-                    print(rgb)
-                img_data.append(rgb)
+                grb = (int(pixel[1] * img_brightness),
+                       int(pixel[0] * img_brightness),
+                       int(pixel[2] * img_brightness))
+                img_data.append(grb)
         
         expression_image_data[expression_name.decode()] = img_data
         image.close()
@@ -53,7 +64,7 @@ for file in os.listdir(directory):
 #print(expression_names)
 
 animation_json = json.load(open("animation_data.json", "r"))
-print(animation_json)
+#print(animation_json)
 
 #get animation and expression metadata
 num_codes = len(animation_json["code_to_button"].keys())
@@ -101,7 +112,7 @@ file.write("}; \n")
 
 #write func to create hex code -> animation enum map
 #flattens the hex code -> button -> animation to just code -> animation, since the board doesn't need to know the button names
-file.write("codeMap codeToAnim[" + str(num_codes) + "] = { \n")
+file.write("const codeMap codeToAnim[" + str(num_codes) + "] = { \n")
 for code in animation_json["code_to_button"].keys():
     button_name = animation_json["code_to_button"][code]
     animation_name = animation_json["button_to_anim"][button_name]
@@ -109,13 +120,12 @@ for code in animation_json["code_to_button"].keys():
 file.write("}; \n")
 
 #write expression and timing data for each animation
-file.write("animationFrame animationData[" + str(num_animations) + "][" +  str(max_anim_frames) + "]= {\n" )
+file.write("PROGMEM const animationFrame animationData[" + str(num_animations) + "][" +  str(max_anim_frames) + "]= {\n" )
 for animation in animation_json["anim_to_framedata"].keys():
     frame_data = animation_json["anim_to_framedata"][animation]
     print(frame_data)
     line = "\t{"
     for frame in frame_data:
-        print(frame)
         line += "{" + frame[0] + ", " + str(frame[1]) + "}, "
     line += "},\n"
     file.write(line)
@@ -140,21 +150,16 @@ int getAnimationFromCode(codeMap codeList[], char code[9]) {
 file.close()
 
 file = open("expressions.h", "w")
-file.write("""
-#define TOTAL_PIXELS """ + str(img_pixels_total) + "\n" + """
-typedef struct rgbData {
-\tint r;
-\tint g;
-\tint b;
-};
-""")
+file.write(" #define TOTAL_PIXELS """ + str(img_pixels_total) + "\n")
+
 #write pixel data for each expression
-file.write("rgbData expressionData["+ str(num_expressions) + "][" + str(img_pixels_total) + "]= {\n")
+file.write("PROGMEM const CRGB expressionData["+ str(num_expressions) + "][" + str(img_pixels_total) + "]= {\n")
 for expression in expression_names:
     img_data = expression_image_data[expression]
-    #{[EXPRESSION], { {0,255,255}, ..., {0, 0, 0} }},
+    #{{0,255,255}, ..., {0, 0, 0} }},
     line = "\t{"
 
+    #LEDs take pixel data in GRB order
     for pixel in img_data:
         line += "{" + str(pixel[0]) + ", " + str(pixel[1]) + ", " + str(pixel[2]) + "}, "
     

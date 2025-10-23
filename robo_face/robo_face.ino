@@ -11,13 +11,61 @@
 
 #define DECODE_NEC
 
-cppQueue animationQueue(4, MAX_ANIM_FRAMES, FIFO);
-unsigned long animFrameStart;
+//TODO
+//Friendship ended with queue data type, just make list of animation frames instead
+//global variable to track position in animation
+//if reaching the end (and index is 8, or 
+//cppQueue animationQueue(4, MAX_ANIM_FRAMES, FIFO);
+
 unsigned long animFrameEnd;
 int currentAnimation;
+int currentAnimationFrame;
 int currentExpression;
-
+animationFrame animationQueue[MAX_ANIM_FRAMES];
 CRGB leds[TOTAL_PIXELS];
+
+
+void addAnimationToQueue(animationFrame queue[], animationFrame frames[]){
+  
+  //end current animation frame if haven't already
+  animFrameEnd = millis();
+	for(int i = 0; i < MAX_ANIM_FRAMES; i++){
+    /*
+    Serial.print("Adding expression to queue: ");
+    Serial.println(pgm_read_word(&(frames[i].expression)));
+    */
+		queue[i] = {pgm_read_word(&(frames[i].expression)), pgm_read_word(&(frames[i].millis))};
+  }
+}
+
+//increment animation frame counter and set new expression + timer
+void advanceAnimation(){
+	currentAnimationFrame++;
+  
+	currentExpression = animationQueue[currentAnimationFrame].expression;
+  animFrameEnd = millis() + animationQueue[currentAnimationFrame].millis;
+  /*
+  Serial.print("Current Frame: ");
+  Serial.print(currentAnimationFrame);
+  Serial.print(", Displaying ");
+  Serial.print(currentExpression);
+  Serial.print(" for ");
+  Serial.println(animationQueue[currentAnimationFrame].millis);
+  */
+}
+
+void showExpression(){
+  //get pixel pixel data for expression and apply to LEDs
+  for(int i = 0; i < TOTAL_PIXELS; i++) {
+    const int g = pgm_read_word(&expressionData[currentExpression][i].g);
+    const int r = pgm_read_word(&expressionData[currentExpression][i].r);
+    const int b = pgm_read_word(&expressionData[currentExpression][i].b);
+    leds[i].green = g;
+    leds[i].red = r;
+    leds[i].blue = b;
+  }
+  FastLED.show();
+}
 
 void setup() {
   Serial.begin(9600);
@@ -29,25 +77,27 @@ void setup() {
   
   //start animation is default w/ blinking
   currentAnimation = ANIM_DEFAULT;
+  
+  addAnimationToQueue(animationQueue, animationData[currentAnimation]);
+  currentAnimationFrame = -1;
+  advanceAnimation();
+
   for(int i = 0; i < MAX_ANIM_FRAMES; i++){
-    animationQueue.push(&animationData[currentAnimation][i]);
+    Serial.print("queue position ");
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.println(animationQueue[i].expression);
   }
 
-  animationFrame frame;
-  animationQueue.pop(&frame);
-  currentExpression = frame.expression;
-
-  animFrameStart = millis();
-  animFrameEnd = millis() + frame.millis;
   Serial.print("Current Expression: ");
   Serial.println(currentExpression);
+  Serial.println("Until: ");
+  Serial.println(animFrameEnd);
 
+  showExpression();
 }
 
 void loop() {
-
-  
-
   //if an IR data packet has been received
   if (IrReceiver.decode()) {   
     Serial.println("receiving..."); 
@@ -65,18 +115,12 @@ void loop() {
       int animNumber = getAnimationFromCode(codeToAnim, hexCode);
       //a corresponding animation was found for the received code
       if (animNumber != ANIM_NONE) {
-        //Serial.println(animNumber);
-        //clear old animation from queue
-        animationQueue.flush();
+        Serial.println(animNumber);
+        //update current animation to selected
         currentAnimation=animNumber;
 
-        //add all frames of the selected animation to the queue
-        for(int i = 0; i < MAX_ANIM_FRAMES; i++){
-          //if the frame has 0 ms, it can be ignored
-          if(animationData[animNumber][i].millis != 0){
-            animationQueue.push(&animationData[animNumber][i]);
-          }
-        }
+        addAnimationToQueue(animationQueue, animationData[currentAnimation]);
+
       }
     }
     IrReceiver.resume(); // Enable receiving of the next value
@@ -84,24 +128,15 @@ void loop() {
 
   //if current animation frame has been displayed for the necessary duration, display next or loop
   if (millis() > animFrameEnd){
-    
+    advanceAnimation();
+
     //if at end of animation, loop current animation
-    if(animationQueue.isEmpty()){
-      for(int i = 0; i < MAX_ANIM_FRAMES; i++){
-        //if the frame has 0 ms, it can be ignored
-          if(animationData[currentAnimation][i].millis != 0){
-            animationQueue.push(&animationData[currentAnimation][i]);
-          }
-      }
+    if(currentAnimationFrame == MAX_ANIM_FRAMES || animationQueue[currentAnimationFrame].millis == 0){
+      addAnimationToQueue(animationQueue, animationData[currentAnimation]);
+      currentAnimationFrame = -1;
+      advanceAnimation();
     }
-
-    animationFrame frame;
-    animationQueue.pop(&frame);
-    currentExpression = frame.expression;
-
-    animFrameStart = millis();
-    animFrameEnd = millis() + frame.millis;
-    Serial.print("Current Expression: ");
-    Serial.println(currentExpression);
+    
+    showExpression();
   }
 }
