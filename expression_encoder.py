@@ -3,8 +3,6 @@ import json
 import os
 ## take a directory of expression images and produce a C++ file with enum-referenceable RGB data
 
-#scale down rgb values so pixels aren't maxxed out by bright colours in images
-img_brightness = 0.1
 
 #absolute filepath for folder containing expression image files
 expression_directory_path = "C:\\Users\\jonat\\Documents\\RoboFace\\expressions8x16\\"
@@ -50,12 +48,12 @@ for file in os.listdir(directory):
                 direction = -1
             
             for y in range(start_y, end_y, direction):
-                pixel = image.getpixel((x,y))
+                pixel = image.getpixel((x,y)) #(r, g, b)
                 #ignores 4th val, so no transparency used if png
-                grb = (int(pixel[1] * img_brightness),
-                       int(pixel[0] * img_brightness),
-                       int(pixel[2] * img_brightness))
-                img_data.append(grb)
+                rgb = (int(pixel[0]),
+                       int(pixel[1]),
+                       int(pixel[2]))
+                img_data.append(rgb)
         
         expression_image_data[expression_name.decode()] = img_data
         image.close()

@@ -57,11 +57,11 @@ void advanceAnimation(){
 void showExpression(){
   //get pixel pixel data for expression and apply to LEDs
   for(int i = 0; i < TOTAL_PIXELS; i++) {
-    const int g = pgm_read_word(&expressionData[currentExpression][i].g);
     const int r = pgm_read_word(&expressionData[currentExpression][i].r);
+    const int g = pgm_read_word(&expressionData[currentExpression][i].g);
     const int b = pgm_read_word(&expressionData[currentExpression][i].b);
-    leds[i].green = g;
     leds[i].red = r;
+    leds[i].green = g;
     leds[i].blue = b;
   }
   FastLED.show();
@@ -72,7 +72,9 @@ void setup() {
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
   Serial.println("Started up"); 
 
-  FastLED.addLeds<WS2812, LED_DATA_PIN>(leds, TOTAL_PIXELS);
+  FastLED.addLeds<WS2812, LED_DATA_PIN, GRB>(leds, TOTAL_PIXELS);
+  FastLED.setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(32);
   
   
   //start animation is default w/ blinking
@@ -99,23 +101,19 @@ void setup() {
 
 void loop() {
   //if an IR data packet has been received
-  if (IrReceiver.decode()) {   
-    Serial.println("receiving..."); 
+  if (IrReceiver.decode()) {
 
     //convert received data to 8 character hex code
     auto recvData = IrReceiver.decodedIRData.decodedRawData;
     char hexCode [9];
     ltoa(recvData, hexCode, 16);
-    //String hexString = String(hexCode);
-    //hexString.toUpperCase();
+    //Serial.println(hexCode);
 
     //ignore repeated/burst data (cluster of the same code is decoded as "0")
     if(strcmp("0", hexCode) != 0){
-      Serial.println(hexCode);
       int animNumber = getAnimationFromCode(codeToAnim, hexCode);
       //a corresponding animation was found for the received code
       if (animNumber != ANIM_NONE) {
-        Serial.println(animNumber);
         //update current animation to selected
         currentAnimation=animNumber;
 
