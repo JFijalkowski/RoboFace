@@ -123,7 +123,7 @@ const codeMap codeToAnim[21] = {
 	{"b54aff00", ANIM_ANGRY}, 
 }; 
 PROGMEM const animationFrame animationData[21][9]= {
-	{{NEUTRAL, 5000}, {BLINK1, 60}, {BLINK2, 60}, {BLANK, 60}, {BLINK2, 60}, {BLINK3, 60}, {BLINK4, 60}, },
+	{{BLINK1, 50}, {BLINK2, 50}, {BLANK, 50}, {BLINK2, 50}, {BLINK3, 50}, {BLINK4, 50}, {NEUTRAL, 5000}, },
 	{{HAPPY, 5000}, },
 	{{SUNGLASSES, 5000}, },
 	{{NEKO, 5000}, },

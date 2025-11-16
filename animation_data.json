@@ -47,7 +47,7 @@
 
     },
     "anim_to_framedata": {
-        "ANIM_DEFAULT"      : [["NEUTRAL", 5000], ["BLINK1", 60], ["BLINK2", 60], ["BLANK", 60], ["BLINK2", 60], ["BLINK3", 60], ["BLINK4", 60]],
+        "ANIM_DEFAULT"      : [["BLINK1", 50], ["BLINK2", 50], ["BLANK", 50], ["BLINK2", 50], ["BLINK3", 50], ["BLINK4", 50], ["NEUTRAL", 5000]],
         "ANIM_HAPPY"        : [["HAPPY", 5000]],
         "ANIM_SUNGLASSES"   : [["SUNGLASSES", 5000]],
         "ANIM_NEKO"         : [["NEKO", 5000]],
